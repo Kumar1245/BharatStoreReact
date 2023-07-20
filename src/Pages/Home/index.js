@@ -53,7 +53,7 @@ const Home = () => {
             <ArrowForwardIcon />
           </span>
         </div>
-        <div className="grid lg:grid-cols-5 md:grid-cols-3 gap-4 p-6 s ">
+        <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:w-auto sm:h-auto gap-4 p-6 s ">
           {CardData.map((item) => {
             return (
               <>
@@ -142,7 +142,7 @@ const Home = () => {
                     <img src={Vector} alt="" />
                     <img src={Vector} alt="" />
                     <img src={HalfStar} alt="" />
-                    <p className="gap-4 text-sm  ">(40)</p>
+                    <p className="gap-4 text-sm  ">({40})</p>
                   </span>
                 </div>
               </div>
