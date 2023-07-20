@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
@@ -9,36 +9,68 @@ import NotificationImportantIcon from "@mui/icons-material/NotificationImportant
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import Divider from "@mui/material/Divider";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import MenuIcon from "@mui/icons-material/Menu";
 
 import BharatStore from "../../Assets/bharatstore.png";
 
 import { MockData } from "../../Components";
-import { Button } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Header = () => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open2 = Boolean(anchorEl);
+  const [profile, setProfile] = useState({});
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const token = localStorage.getItem("token");
+  const profileData = async () => {
+    await axios
+      .get(`https://api-eduvila.onrender.com/profile?token=${token}`)
+      .then((res) => {
+        setProfile(res?.data?.[0]);
+        // dispatch(setUserData(res?.data?.[0]));
+      })
+      .catch((error) => {
+        alert("Data error");
+      });
+  };
+  useEffect(() => {
+    localStorage.getItem("token") && profileData();
+  }, [localStorage.getItem("token")]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    handleClose();
+    navigate("/signin");
+    setProfile({});
+    // dispatch(setUserData({}));
+    // dispatch(setState(false));
+  };
   return (
     <>
       <div className="hidden lg:flex md:flex justify-between bg-gradient-to-r from-[#DE1C34] to-[#520B29]  ">
         <span className="flex px-6 py-2 items-center gap-4 text-white ">
-          {/* <img
-            src="https://cdn-icons-png.flaticon.com/512/1851/1851070.png"
-            alt=""
-            className="h-6 w-6 ml-5"
-          /> */}
           <PhoneInTalkIcon />
           <p className="w-6  text-white">09887654211</p>
         </span>
         <span className="flex gap-3 justify-center items-center px-10 text-white">
-          {/* {MockData.map((i) => {
-            return (
-              <>
-                <p>{i.image_facebook}</p>
-                <p>{i.image_Insta}</p>
-                <p>{i.image_twitter}</p>
-                <p>{i.image_limkdn}</p>
-              </>
-            );
-          })} */}
           <FacebookIcon className="h-4 w-4" />
           <InstagramIcon className="h-4 w-4" />
           <TwitterIcon className="h-4 w-4" />
@@ -96,7 +128,9 @@ const Header = () => {
       </div>
       <div className="bg-gradient-to-r from-red-200 to-gray-300">
         <div className="flex justify-between ">
-          <span>
+          <span className="flex gap-3 p-3">
+            <MenuIcon onClick={() => setOpen(true)} />
+
             <img src={BharatStore} alt="" />
           </span>
           <span className="flex justify-center items-center gap-3 px-8 ">
@@ -115,24 +149,99 @@ const Header = () => {
               size="small"
               className="!bg-gradient-to-r from-[#DE1C34] to-[#520B29] !rounded-xl"
             >
-              Login
+              {localStorage.getItem("token") ? (
+                <Avatar alt={profile.name} src="b" onClick={handleClick} />
+              ) : (
+                <Link to="/signup">Sign Up</Link>
+              )}
             </Button>
           </span>
         </div>
+
+        {/* Drawer */}
+        <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+          <List>
+            <ListItemButton>About Us</ListItemButton>
+
+            <ListItemButton>Contact Us</ListItemButton>
+            <ListItemButton>Services</ListItemButton>
+          </List>
+        </Drawer>
+
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open2}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+        >
+          <ListItem className="!flex !outline-none !flex-col !w-60 !gap-3">
+            <Avatar alt={profile.name} src="b" />
+            <p>{profile.name}</p>
+            <p>{profile.email}</p>
+          </ListItem>
+          <MenuItem onClick={() => navigate("/profile")}>My account</MenuItem>
+          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        </Menu>
+
         <Divider className="!px-4" />
         <div className="flex gap-3 px-20 py-4 bg-gradient-to-r from-red-200 to-gray-300">
           <Button
             variant="outlined"
             className="!bg-gradient-to-r from-[#DE1C34] to-[#520B29] !rounded-2xl !text-white  "
           >
-            All Product
+            <Link to="/">Home</Link>
           </Button>
           <Button
             variant="outlined"
             className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
             endIcon={<KeyboardArrowDownIcon />}
           >
-            Send
+            <Link to="/product">All Product</Link>
+          </Button>
+          <Button
+            variant="outlined"
+            className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Grocery
+          </Button>
+          <Button
+            variant="outlined"
+            className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Grocery
+          </Button>
+          <Button
+            variant="outlined"
+            className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Grocery
+          </Button>
+          <Button
+            variant="outlined"
+            className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Grocery
+          </Button>
+          <Button
+            variant="outlined"
+            className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Grocery
+          </Button>
+          <Button
+            variant="outlined"
+            className="!rounded-2xl !text-white !border-[#46383e] !border-t-0"
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Grocery
           </Button>
         </div>
       </div>
